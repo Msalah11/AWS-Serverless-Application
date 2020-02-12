@@ -3,7 +3,7 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult, APIGatewayProxyHandler } f
 import {getAllToDo} from "../../logic/TODO";
 
 export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-  // Done: Get all items for a current user
+    // Done: Get all items for a current user
 
     const authorization = event.headers.Authorization;
     const split = authorization.split(' ');
@@ -15,6 +15,7 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
         statusCode: 200,
         headers: {
             "Access-Control-Allow-Origin": "*",
+            'Access-Control-Allow-Credentials': true,
         },
         body: JSON.stringify({
             "items": toDos,

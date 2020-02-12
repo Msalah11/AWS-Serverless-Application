@@ -10,7 +10,7 @@ const jwkToPem = require('jwk-to-pem');
 
 const logger = createLogger('auth')
 
-const jwksUrl = 'https://test-endpoint.auth0.com/.well-known/jwks.json'
+const jwksUrl = 'https://kuflab.auth0.com/.well-known/jwks.json'
 
 export const handler = async (
     event: CustomAuthorizerEvent

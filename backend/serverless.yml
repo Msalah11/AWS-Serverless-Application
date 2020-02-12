@@ -189,4 +189,6 @@ resources:
                 - '*'
               AllowedMethods:
                 - PUT
+                - GET
+                - POST
               MaxAge: 300
