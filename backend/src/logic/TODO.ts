@@ -24,6 +24,19 @@ export function createToDo(createTodoRequest: CreateTodoRequest, jwtToken: strin
     });
 }
 
+export function createAttachment(todoId: string, attachmentId: string, event: any, jwtToken: string) {
+    const timestamp = new Date().toISOString();
+    const newAttach = JSON.parse(event.body);
+    const newItem = {
+        todoId,
+        timestamp,
+        attachmentId,
+        userId: parseUserId(jwtToken),
+        ...newAttach,
+    };
+    return toDoAccess.createAttachment(newItem);
+}
+
 export function updateToDo(updateTodoRequest: UpdateTodoRequest, todoId: string, jwtToken: string): Promise<TodoUpdate> {
     const userId = parseUserId(jwtToken);
     return toDoAccess.updateToDo(updateTodoRequest, todoId, userId);
@@ -36,4 +49,13 @@ export function deleteToDo(todoId: string, jwtToken: string): Promise<string> {
 
 export function generateUploadUrl(todoId: string): Promise<string> {
     return toDoAccess.generateUploadUrl(todoId);
+}
+
+export function getToDoAttachment(todoId: string) {
+    return toDoAccess.getAttachment(todoId);
+}
+
+export function updateItemAttachment(todoId: string, attachmentUrl: any, jwtToken: any) {
+    const userId = parseUserId(jwtToken);
+    return toDoAccess.updateToDoAttachment(todoId, attachmentUrl, userId);
 }

@@ -192,9 +192,7 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
                   <Icon name="delete" />
                 </Button>
               </Grid.Column>
-              {todo.attachmentUrl && (
-                <Image src={todo.attachmentUrl} size="small" wrapped />
-              )}
+                <Image src={'udacity-project-serverless-application-dev.s3.amazonaws.com/' + todo.todoId} size="small" wrapped />
               <Grid.Column width={16}>
                 <Divider />
               </Grid.Column>

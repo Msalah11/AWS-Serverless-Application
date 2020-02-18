@@ -9,6 +9,7 @@ export class ToDoAccess {
         private readonly docClient: DocumentClient = new AWS.DynamoDB.DocumentClient(),
         private readonly s3Client: Types = new AWS.S3({signatureVersion: 'v4'}),
         private readonly todoTable = process.env.TODOS_TABLE,
+        private readonly attachmentTable = process.env.ATTACHMENT_TABLE,
         private readonly s3BucketName = process.env.S3_BUCKET_NAME) {
     }
 
@@ -33,6 +34,25 @@ export class ToDoAccess {
         return items as TodoItem[]
     }
 
+    async getToDo(todoId: string) {
+        console.log("Getting Todo By todoId");
+
+        const params = {
+            TableName: this.todoTable,
+            KeyConditionExpression: 'todoId = :todoId',
+            ExpressionAttributeValues: {
+                ':todoId': todoId
+            },
+            ScanIndexForward: false
+        };
+
+        const result = await this.docClient.query(params).promise();
+        console.log('Getting Todo By todoId fetched');
+        const items = result.Items;
+
+        return items[0];
+    }
+
     async createToDo(todoItem: TodoItem): Promise<TodoItem> {
         console.log("Creating new todo");
 
@@ -45,6 +65,22 @@ export class ToDoAccess {
         console.log(result);
 
         return todoItem as TodoItem;
+    };
+
+    async createAttachment(item) {
+        console.log("Creating new Attachment todo");
+        const attachmentItem = {
+            ...item,
+            attachmentUrl: `https://${this.s3BucketName}.s3.amazonaws.com/${item.attachmentId}`
+        };
+        const params = {
+            TableName: this.attachmentTable,
+            Item: attachmentItem,
+        };
+
+        await this.docClient.put(params).promise();
+
+        return attachmentItem as TodoItem;
     }
 
     async updateToDo(todoUpdate: TodoUpdate, todoId: string, userId: string): Promise<TodoUpdate> {
@@ -75,7 +111,29 @@ export class ToDoAccess {
         const attributes = result.Attributes;
 
         return attributes as TodoUpdate;
-    }
+    };
+
+    async updateToDoAttachment(todoId, attachmentUrl, userId): Promise<TodoItem> {
+        console.log('start update todo to add attachment');
+        const item = await this.getToDo(todoId);
+        const updatedItem = {
+            todoId: todoId,
+            userId: userId,
+            createdAt: item.createdAt,
+            name: item.name,
+            dueDate:item.dueDate,
+            done: item.done,
+            attachmentUrl: attachmentUrl
+        };
+        console.log('updatedItem', updatedItem);
+        await this.docClient.put({
+            TableName: this.todoTable,
+            Item: updatedItem
+        }).promise();
+        console.log("upload completed!");
+
+        return updatedItem as TodoItem;
+    };
 
     async deleteToDo(todoId: string, userId: string): Promise<string> {
         console.log("Deleting todo");
@@ -105,5 +163,21 @@ export class ToDoAccess {
         console.log(url);
 
         return url as string;
+    }
+
+    async getAttachment(todoId: string) {
+
+        const params = {
+            TableName: this.attachmentTable,
+            KeyConditionExpression: 'todoId = :todoId',
+            ExpressionAttributeValues: {
+                ':todoId': todoId
+            },
+            ScanIndexForward: false
+        };
+
+        const result = await this.docClient.query(params).promise();
+        console.log(result);
+        return result.Items;
     }
 }

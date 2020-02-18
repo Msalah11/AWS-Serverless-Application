@@ -17,7 +17,22 @@ provider:
   environment:
     PROJECT_NAME: udacity-project-serverless-application
     TODOS_TABLE: udacity-project-serverless-application-${self:provider.stage}
+    ATTACHMENT_TABLE: udacity-project-serverless-application-attachment-${self:provider.stage}
     S3_BUCKET_NAME: udacity-project-serverless-application-${self:provider.stage}
+
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Scan
+        - dynamodb:PutItem
+        - dynamodb:GetItem
+      Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
+    - Effect: Allow
+      Action:
+        - dynamodb:Scan
+        - dynamodb:PutItem
+        - dynamodb:GetItem
+      Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.ATTACHMENT_TABLE}
 
 custom:
   documentation:
@@ -149,6 +164,7 @@ functions:
       - Effect: Allow
         Action:
           - s3:*
+          - dynamodb:*
         Resource: arn:aws:s3:::${self:provider.environment.S3_BUCKET_NAME}/*
 
 resources:
@@ -169,6 +185,21 @@ resources:
             KeyType: RANGE
         BillingMode: PAY_PER_REQUEST
         TableName: ${self:provider.environment.TODOS_TABLE}
+    AttachmentTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: todoId
+            AttributeType: S
+          - AttributeName: timestamp
+            AttributeType: S
+        KeySchema:
+          - AttributeName: todoId
+            KeyType: HASH
+          - AttributeName: timestamp
+            KeyType: RANGE
+        BillingMode: PAY_PER_REQUEST
+        TableName: ${self:provider.environment.ATTACHMENT_TABLE}
     onlyBody:
       Type: "AWS::ApiGateway::RequestValidator"
       Properties:
@@ -191,4 +222,6 @@ resources:
                 - PUT
                 - GET
                 - POST
-              MaxAge: 300
+                - HEAD
+                - DELETE
+              MaxAge: 30000
