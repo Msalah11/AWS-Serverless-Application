@@ -34,14 +34,15 @@ export class ToDoAccess {
         return items as TodoItem[]
     }
 
-    async getToDo(todoId: string) {
+    async getToDo(todoId: string, userId: string) {
         console.log("Getting Todo By todoId");
 
         const params = {
             TableName: this.todoTable,
-            KeyConditionExpression: 'todoId = :todoId',
+            KeyConditionExpression: 'userId = :userId AND todoId = :todoId',
             ExpressionAttributeValues: {
-                ':todoId': todoId
+                ':todoId': todoId,
+                ':userId': userId,
             },
             ScanIndexForward: false
         };
@@ -115,7 +116,7 @@ export class ToDoAccess {
 
     async updateToDoAttachment(todoId, attachmentUrl, userId): Promise<TodoItem> {
         console.log('start update todo to add attachment');
-        const item = await this.getToDo(todoId);
+        const item = await this.getToDo(todoId, userId);
         const updatedItem = {
             todoId: todoId,
             userId: userId,

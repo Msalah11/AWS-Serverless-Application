@@ -4,7 +4,7 @@ import * as uuid from 'uuid';
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult, APIGatewayProxyHandler } from 'aws-lambda';
 
-
+const s3BucketName = process.env.S3_BUCKET_NAME
 export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     // DONE: Return a presigned URL to upload a file for an item with the provided id
     const authorization = event.headers.Authorization;
@@ -33,6 +33,7 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
 
 async function createAttachmentItem(todoId: string, attachmentId: string, event: any, jwtToken: string) {
     const newAttachment = await createAttachment(todoId, attachmentId, event, jwtToken);
-    await updateItemAttachment(todoId, `https://udacity-project-serverless-application-dev.s3.amazonaws.com/${attachmentId}`, jwtToken);
+    const attachmentURL = `${s3BucketName}.s3.amazonaws.com/${attachmentId}`;
+    await updateItemAttachment(todoId, attachmentURL, jwtToken);
     return newAttachment;
 }
