@@ -13,8 +13,8 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
 
     const todoId = event.pathParameters.todoId;
 
-    const URL = await generateUploadUrl(todoId);
     const attachmentId = uuid.v4();
+    const URL = await generateUploadUrl(attachmentId);
 
     const newItem = await createAttachmentItem(todoId, attachmentId, event, jwtToken);
     const Attachments = await getToDoAttachment(todoId);

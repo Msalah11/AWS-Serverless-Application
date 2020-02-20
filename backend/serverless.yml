@@ -29,6 +29,10 @@ provider:
       Action:
         - dynamodb:*
       Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.ATTACHMENT_TABLE}
+    - Effect: Allow
+      Action:
+        - s3:*
+      Resource: arn:aws:s3:::${self:provider.environment.S3_BUCKET_NAME}/*
 
 custom:
   documentation:

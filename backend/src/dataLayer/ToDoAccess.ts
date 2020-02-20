@@ -153,15 +153,15 @@ export class ToDoAccess {
         return "" as string;
     }
 
-    async generateUploadUrl(todoId: string): Promise<string> {
+    async generateUploadUrl(attachmentId: string): Promise<string> {
         console.log("Generating URL");
 
         const url = this.s3Client.getSignedUrl('putObject', {
             Bucket: this.s3BucketName,
-            Key: todoId,
+            Key: attachmentId,
             Expires: 1000,
         });
-        console.log(url);
+        console.log('Bucket url', url);
 
         return url as string;
     }
